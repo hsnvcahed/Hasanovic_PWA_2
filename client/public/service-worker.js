@@ -1,5 +1,3 @@
-importScripts("/precache-manifest.701799ead02fac19b686d67051e44946.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
-
 if (workbox) {
   console.log(`Workbox is loaded`);
   workbox.setConfig({ debug: true });
@@ -19,4 +17,3 @@ if (workbox) {
 } else {
   console.log(`Workbox didn't load`);
 }
-

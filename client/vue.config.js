@@ -3,6 +3,10 @@ const path = require('path');
 module.exports = {
   outputDir: path.resolve(__dirname, '../server/public'),
   pwa: {
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      swSrc: 'public/service-worker.js',
+    },
     manifestOptions: {
       name: 'PWA Demo Employees',
       short_name: 'PWA Demo',

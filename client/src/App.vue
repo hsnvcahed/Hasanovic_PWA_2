@@ -1,13 +1,13 @@
 <template>
   <div id="app" class="container d-flex flex-column justify-content-center align-items-center mt-5">
-    <h3>Willkommen bei der Service Worker Untersuchung!</h3>
+    <p class="text-h2 my-1">Employee Database</p>
+    <img alt="no image" src="/images/employees.jpg" class="my-5" style="width: 60%" />
     <ButtonGet @get="fetchData"></ButtonGet>
     <CardView :employees="employees" @del="delEmployee"> </CardView>
   </div>
 </template>
 
 <script>
-import dotenv from 'dotenv';
 import axios from 'axios';
 import ButtonGet from '@/components/ButtonGet.vue';
 import CardView from '@/components/CardView.vue';
@@ -43,7 +43,6 @@ export default {
   },
   created() {
     document.addEventListener('swUpdated', this.updateAvailable, { once: true });
-    dotenv.config();
   },
 };
 </script>
