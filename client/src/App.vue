@@ -2,6 +2,7 @@
   <div id="app" class="container d-flex flex-column justify-content-center align-items-center mt-5">
     <p class="text-h2 my-1">Employee Database</p>
     <img alt="no image" src="/images/employees.jpg" class="my-5" style="width: 60%" />
+    <div v-if="offline" class="alert text-center fw-bold alert-danger w-100">You are offline</div>
     <ButtonGet @get="fetchData"></ButtonGet>
     <CardView :employees="employees" @del="delEmployee"> </CardView>
   </div>
@@ -22,6 +23,7 @@ export default {
     return {
       employees: [],
       serverAddress: process.env.VUE_APP_SERVER,
+      offline: false,
     };
   },
   methods: {
@@ -40,9 +42,16 @@ export default {
       });
       this.fetchData();
     },
+    updateAvailable() {
+      if (confirm(`New content is available!. Click OK to refresh`)) {
+        window.location.reload();
+      }
+    },
   },
   created() {
-    document.addEventListener('swUpdated', this.updateAvailable, { once: true });
+    document.addEventListener('swUpdated', this.updateAvailable);
+    window.addEventListener('online', () => (this.offline = false));
+    window.addEventListener('offline', () => (this.offline = true));
   },
 };
 </script>
