@@ -1,0 +1,6 @@
+POST https://hasanovic-pwa2.herokuapp.com/notify
+Content-Type: application/json
+
+{
+    "message": "Hello, this is a test for the push notification"
+}
