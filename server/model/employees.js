@@ -4,8 +4,13 @@ const path = require('path');
 const f = path.resolve(__dirname, 'employees.json');
 
 const data = fs.readFileSync(f);
-const { employees } = JSON.parse(data);
+let { employees } = JSON.parse(data);
 
 const getEmployees = () => employees;
 
-module.exports = { getEmployees };
+const delEmployee = (id) => {
+  employees = employees.filter((el) => el.id != id);
+  console.log(employees);
+};
+
+module.exports = { getEmployees, delEmployee };

@@ -2,7 +2,7 @@ const express = require('express');
 const webpush = require('web-push');
 const asyncHandler = require('express-async-handler');
 
-const { getEmployees } = require('../model/employees');
+const { getEmployees, delEmployee } = require('../model/employees');
 require('dotenv').config();
 
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
@@ -17,6 +17,13 @@ router.get(
   '/employees',
   asyncHandler(async (req, res) => {
     res.json(getEmployees());
+  }),
+);
+
+router.delete(
+  '/employees/:id',
+  asyncHandler(async (req, res) => {
+    res.json(delEmployee(req.params.id));
   }),
 );
 

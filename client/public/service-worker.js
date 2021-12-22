@@ -9,12 +9,16 @@ if (workbox) {
       cacheName: 'ahmed-image-cache',
     }),
   );
-  workbox.routing.registerRoute(
-    '/employees',
-    new workbox.strategies.CacheFirst({
-      cacheName: 'ahmeds-cache',
-    }),
-  );
+
+
+  // workbox.routing.registerRoute(
+  //   '/employees',
+  //   new workbox.strategies.NetworkFirst({
+  //     cacheName: 'ahmeds-cache',
+  //   }),
+  // );
+
+  
   self.addEventListener('push', (event) => {
     const data = event.data.json();
     self.registration.showNotification(data.title, {

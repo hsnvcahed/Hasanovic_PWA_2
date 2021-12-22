@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="container d-flex flex-column justify-content-center align-items-center mt-5">
-    <div class="container d-flex flex-row justify-content-right w-100">
+    <div class="container d-flex flex-row w-100">
       <p>Get the latest news!</p>
       <button @click="subscribe" class="btn btn-success">Subscribe</button>
     </div>
@@ -8,12 +8,13 @@
     <img alt="no image" src="/images/employees.jpg" class="my-5" style="width: 60%" />
     <div v-if="offline" class="alert text-center fw-bold alert-danger w-100">You are offline</div>
     <ButtonGet @get="fetchData"></ButtonGet>
-    <CardView :employees="employees" @del="delEmployee"> </CardView>
+    <CardView :offline="!offline" :employees="employees" @del="delEmployee"> </CardView>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { openDB } from 'idb';
 import ButtonGet from '@/components/ButtonGet.vue';
 import CardView from '@/components/CardView.vue';
 
@@ -31,19 +32,41 @@ export default {
     };
   },
   methods: {
-    async fetchData() {
-      let result = await axios({
-        url: this.serverAddress + '/employees',
-        method: 'GET',
+    async setUpIDB() {
+      this.db = await openDB('employeesDB', 1, {
+        upgrade(db, oldVersion, newVersion) {
+          const store = db.createObjectStore('employees', { keyPath: 'id' });
+        },
       });
-      this.employees = result.data;
+    },
+    async fetchData() {
+      if (!this.offline) {
+        let { data } = await axios.get(`${this.serverAddress}/employees`);
+        data = data.map((el) => ({ ...el, isDeleted: false }));
+        this.employees = data;
+        await this.db.clear('employees');
+        for (let el of data) {
+          await this.db.put('employees', el);
+        }
+      } else {
+        console.log('GETTING FROM IDB');
+        console.log('#################');
+
+        const employees = await this.db.getAll('employees');
+        this.employees = employees.filter((el) => !el.isDeleted);
+      }
     },
     async delEmployee(e) {
-      const employeeId = e.id;
-      await axios({
-        url: this.serverAddress + `/employees/${employeeId}`,
-        method: 'DELETE',
-      });
+      if (!this.offline) {
+        const employeeId = e.id;
+        await axios({
+          url: this.serverAddress + `/employees/${employeeId}`,
+          method: 'DELETE',
+        });
+      } else {
+        e.isDeleted = true;
+        await this.db.put('employees', e);
+      }
       this.fetchData();
     },
     updateAvailable() {
@@ -75,11 +98,20 @@ export default {
       }
       return outputArray;
     },
+    async isOnline() {
+      this.offline = false;
+      let dbData = await this.db.getAll('employees');
+      dbData = dbData.filter((el) => el.isDeleted);
+      for (let emp of dbData) {
+        await this.delEmployee(emp);
+      }
+    },
   },
   created() {
     document.addEventListener('swUpdated', this.updateAvailable);
-    window.addEventListener('online', () => (this.offline = false));
+    window.addEventListener('online', () => this.isOnline());
     window.addEventListener('offline', () => (this.offline = true));
+    this.setUpIDB();
   },
 };
 </script>
